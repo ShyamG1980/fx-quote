@@ -222,23 +222,11 @@ h1 { font-family: var(--mono); font-size: 17px; font-weight: 500; color: var(--t
       <span id="quoteTime" style="color:var(--text-dim)"></span>
     </div>
 
-    <div class="rate-display rate-mid">
-      <div class="rate-label">Mid-Market Rate</div>
-      <div class="rate-value" id="midRate">—</div>
-      <div class="rate-sub" id="pairLabel">—</div>
-    </div>
-
-    <div class="rates-grid">
-      <div class="rate-display rate-buy">
-        <div class="rate-label">Buy Rate (client buys base)</div>
-        <div class="rate-value" id="buyRate">—</div>
-        <div class="rate-sub" id="buyNotional">—</div>
-      </div>
-      <div class="rate-display rate-sell">
-        <div class="rate-label">Sell Rate (client sells base)</div>
-        <div class="rate-value" id="sellRate">—</div>
-        <div class="rate-sub" id="sellNotional">—</div>
-      </div>
+    <div class="rate-display rate-sell" style="grid-column:1/-1">
+      <div class="rate-label">Your Rate (${base}/${quote})</div>
+      <div class="rate-value" id="sellRate">—</div>
+      <div class="rate-sub" id="sellNotional">—</div>
+      <div class="rate-sub" id="pairLabel" style="margin-top:4px">—</div>
     </div>
 
     <div class="notional-display" id="notionalDisplay"></div>
@@ -363,110 +351,111 @@ function getRate(base, quote) {
 // ── Client history from spread monitor ───────────────────────────
 function loadClientHistory() {
   try {
-    const raw = localStorage.getItem(CLIENT_HISTORY);
+    const raw = localStorage.getItem('sm_trades_v2');
     if (!raw) return;
     const trades = JSON.parse(raw);
     const clients = [...new Set(trades.map(t => t.client).filter(Boolean))].sort();
     const chips = document.getElementById('clientChips');
     chips.innerHTML = clients.map(c =>
-      `<div class="chip" onclick="selectClient('${c.replace(/'/g,"\\'")}')"> ${c}</div>`
+      `<div class="chip" onclick="selectClient('${c.replace(/'/g,"\\'")}', event)">${c}</div>`
     ).join('');
   } catch(e) {}
 }
 
-function selectClient(name) {
+function selectClient(name, event) {
   document.getElementById('clientName').value = name;
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   event.target.classList.add('active');
   lookupClientSpread(name);
 }
 
-function lookupClientSpread(clientName) {
+function getClientSpread(clientName, base, quote) {
   try {
-    const raw = localStorage.getItem(CLIENT_HISTORY);
-    if (!raw) return;
+    const raw = localStorage.getItem('sm_trades_v2');
+    if (!raw) return null;
     const trades = JSON.parse(raw);
-    const base  = document.getElementById('baseCcy').value;
-    const quote = document.getElementById('quoteCcy').value;
-    const pair  = base + quote;
+    const pair1 = base + quote;
+    const pair2 = quote + base;
+    // Exact pair match first
+    const byPair = trades
+      .filter(t => t.client === clientName && t.pair && (t.pair === pair1 || t.pair === pair2))
+      .sort((a,b) => new Date(b.date) - new Date(a.date));
+    if (byPair.length > 0) return byPair[0].spread;
+    // Fall back to any pair for this client
+    const any = trades
+      .filter(t => t.client === clientName)
+      .sort((a,b) => new Date(b.date) - new Date(a.date));
+    return any.length > 0 ? any[0].spread : null;
+  } catch(e) { return null; }
+}
 
-    // Find most recent trade for this client + pair
-    const clientTrades = trades
-      .filter(t => t.client === clientName && t.pair && (t.pair === pair || t.pair === quote+base))
-      .sort((a,b) => {
-        const da = new Date(a.date), db = new Date(b.date);
-        return (isNaN(da)||isNaN(db)) ? 0 : db - da;
-      });
-
-    if (clientTrades.length > 0) {
-      const last = clientTrades[0];
-      document.getElementById('spreadInput').value = last.spread;
-      document.getElementById('spreadSource').textContent = `↑ ${last.date || 'last trade'}`;
-    } else {
-      // Try any pair for this client
-      const anyTrades = trades
-        .filter(t => t.client === clientName)
-        .sort((a,b) => new Date(b.date) - new Date(a.date));
-      if (anyTrades.length > 0) {
-        document.getElementById('spreadInput').value = anyTrades[0].spread;
-        document.getElementById('spreadSource').textContent = `↑ ${anyTrades[0].pair || 'last trade'}`;
-      } else {
-        document.getElementById('spreadSource').textContent = '';
-      }
-    }
-  } catch(e) {}
+function lookupClientSpread(clientName) {
+  const base  = document.getElementById('baseCcy').value;
+  const quote = document.getElementById('quoteCcy').value;
+  const spread = getClientSpread(clientName, base, quote);
+  if (spread !== null) {
+    document.getElementById('spreadInput').value = spread;
+    document.getElementById('spreadSource').textContent = '↑ from history';
+  } else {
+    document.getElementById('spreadInput').value = '';
+    document.getElementById('spreadSource').textContent = 'no history found';
+  }
 }
 
 // ── Build quote ───────────────────────────────────────────────────
 function buildQuote() {
   const base     = document.getElementById('baseCcy').value;
   const quote    = document.getElementById('quoteCcy').value;
-  const spread   = parseFloat(document.getElementById('spreadInput').value);
   const notional = parseFloat(document.getElementById('notional').value) || 0;
   const client   = document.getElementById('clientName').value.trim() || 'Client';
 
   if (!Object.keys(rates).length) { alert('Please wait for live rates to load first.'); return; }
   if (base === quote) { alert('Please select two different currencies.'); return; }
-  if (isNaN(spread) || spread <= 0) { alert('Please enter a valid spread.'); return; }
+
+  // Auto-pull spread from client history if not already set
+  let spread = parseFloat(document.getElementById('spreadInput').value);
+  if (isNaN(spread) || spread <= 0) {
+    spread = getClientSpread(client, base, quote);
+    if (spread) {
+      document.getElementById('spreadInput').value = spread;
+    } else {
+      alert('Please enter a spread — no previous trade found for this client.'); return;
+    }
+  }
 
   const mid = getRate(base, quote);
   if (!mid) { alert(`Could not calculate rate for ${base}/${quote}.`); return; }
 
   const spreadFactor = spread / 100;
-  const buyRate  = mid * (1 + spreadFactor);  // client buys base, pays more
-  const sellRate = mid * (1 - spreadFactor);  // client sells base, receives less
+  const buyRate  = mid * (1 + spreadFactor);
+  const sellRate = mid * (1 - spreadFactor);
 
   const dp = mid < 10 ? 4 : mid < 100 ? 3 : 2;
 
-  // Notional converted
-  const buyNotional  = notional > 0 ? (notional * buyRate).toLocaleString('en-GB', {maximumFractionDigits:2}) : '';
+  const buyNotional  = notional > 0 ? (notional * buyRate).toLocaleString('en-GB',  {maximumFractionDigits:2}) : '';
   const sellNotional = notional > 0 ? (notional * sellRate).toLocaleString('en-GB', {maximumFractionDigits:2}) : '';
   const notionalFmt  = notional > 0 ? notional.toLocaleString('en-GB') : '';
 
-  document.getElementById('midRate').textContent  = mid.toFixed(dp);
-  document.getElementById('pairLabel').textContent = `${base}/${quote} · Mid-market`;
-  document.getElementById('buyRate').textContent   = buyRate.toFixed(dp);
-  document.getElementById('sellRate').textContent  = sellRate.toFixed(dp);
-  document.getElementById('buyNotional').textContent  = notional > 0 ? `${notionalFmt} ${base} = ${buyNotional} ${quote}` : '';
+  document.getElementById('sellRate').textContent     = sellRate.toFixed(dp);
   document.getElementById('sellNotional').textContent = notional > 0 ? `${notionalFmt} ${base} = ${sellNotional} ${quote}` : '';
+  document.getElementById('pairLabel').textContent    = `Mid-market: ${mid.toFixed(dp)} · Spread: ${spread}%`;
   document.getElementById('notionalDisplay').innerHTML = notional > 0
-    ? `Notional: <span>${notionalFmt} ${base}</span>`  : '';
+    ? `Notional: <span>${notionalFmt} ${base}</span>` : '';
 
   const now = new Date();
   document.getElementById('quoteTime').textContent = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
 
-  // Build email
-  const emailBody = buildQuoteEmail({client, base, quote, mid, buyRate, sellRate, notional, notionalFmt, buyNotional, sellNotional, dp, spread, now});
+  const emailBody = buildQuoteEmail({client, base, quote, mid, sellRate, notional, notionalFmt, sellNotional, dp, spread, now});
   document.getElementById('emailPreview').textContent = emailBody;
 
   document.getElementById('quoteResult').classList.remove('hidden');
   document.getElementById('quoteResult').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-function buildQuoteEmail({client, base, quote, mid, buyRate, sellRate, notional, notionalFmt, buyNotional, sellNotional, dp, spread, now}) {
+function buildQuoteEmail({client, base, quote, mid, sellRate, notional, notionalFmt, sellNotional, dp, spread, now}) {
   const timeStr = now.toLocaleString('en-GB', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
   const notionalLine = notional > 0
-    ? `\nNotional: ${notionalFmt} ${base}\n  → Buy  ${base}: ${buyNotional} ${quote}\n  → Sell ${base}: ${sellNotional} ${quote}`
+    ? `\nNotional: ${notionalFmt} ${base} = ${sellNotional} ${quote}\n`
     : '';
 
   return `Hi ${client},
@@ -476,12 +465,9 @@ Thank you for your enquiry. Please find below your indicative exchange rate quot
 Currency Pair:  ${base}/${quote}
 Quote Time:     ${timeStr}
 
-Mid-Market Rate: ${mid.toFixed(dp)}
-Buy Rate:        ${buyRate.toFixed(dp)}  (you buy ${base})
-Sell Rate:       ${sellRate.toFixed(dp)}  (you sell ${base})
+Your Rate:  ${sellRate.toFixed(dp)}
 ${notionalLine}
-
-Please note these rates are indicative only and subject to change. To lock in a rate, please confirm your order and we will process accordingly.
+Please note this rate is indicative only and subject to change. To lock in a rate, please confirm your order and we will process accordingly.
 
 If you have any questions, please don't hesitate to get in touch.
 
