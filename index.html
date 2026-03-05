@@ -5,471 +5,394 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>C4U FX Quote</title>
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#0a0f1e">
+<meta name="theme-color" content="#0057b8">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="C4U Quote">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a0f1e;
-  --surface: #111827;
-  --surface2: #1a2540;
-  --border: #1e3058;
-  --accent: #3b82f6;
-  --accent2: #10b981;
-  --warn: #f59e0b;
-  --red: #ef4444;
-  --text: #94a3b8;
-  --text-bright: #e2e8f0;
-  --text-dim: #475569;
-  --mono: 'DM Mono', monospace;
-  --sans: 'DM Sans', sans-serif;
+  --blue:       #0057b8;
+  --blue-dark:  #003d82;
+  --blue-light: #e8f0fb;
+  --blue-mid:   #ccddf5;
+  --white:      #ffffff;
+  --bg:         #f4f7fc;
+  --border:     #d0ddf0;
+  --text:       #1a2b4a;
+  --text-mid:   #4a6080;
+  --text-dim:   #8098b8;
+  --shadow-sm:  0 1px 4px rgba(0,87,184,0.08);
+  --shadow:     0 2px 12px rgba(0,87,184,0.12);
+  --shadow-lg:  0 4px 24px rgba(0,87,184,0.16);
+  --font: "Inter", sans-serif;
+  --radius: 10px;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--sans);
-  min-height: 100vh;
-  padding: 20px;
-  overflow-x: hidden;
-}
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(16,185,129,0.05) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-}
-.wrap { max-width: 480px; margin: 0 auto; position: relative; z-index: 1; }
+body { background:var(--bg); color:var(--text); font-family:var(--font); min-height:100vh; padding-bottom:40px; }
 
-/* Header */
-header { margin-bottom: 28px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
-.logo { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
-.logo-icon { width: 36px; height: 36px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-h1 { font-family: var(--mono); font-size: 17px; font-weight: 500; color: var(--text-bright); letter-spacing: 0.5px; }
-.subtitle { font-size: 12px; color: var(--text-dim); font-family: var(--mono); margin-left: 48px; }
+header { background:var(--blue); padding:18px 20px 16px; display:flex; align-items:center; gap:14px; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+.logo-img { width:40px; height:40px; border-radius:8px; object-fit:contain; background:white; padding:4px; }
+.header-text h1 { font-size:18px; font-weight:700; color:#fff; }
+.header-text p { font-size:12px; color:rgba(255,255,255,0.75); margin-top:1px; }
 
-/* Rate ticker */
-.ticker { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
-.ticker::-webkit-scrollbar { display: none; }
-.tick { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; white-space: nowrap; flex-shrink: 0; }
-.tick-pair { font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
-.tick-rate { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--text-bright); }
-.tick-chg { font-size: 10px; font-family: var(--mono); }
-.tick-chg.up { color: var(--accent2); }
-.tick-chg.dn { color: var(--red); }
+.ticker-wrap { background:var(--blue-dark); padding:8px 16px; overflow-x:auto; scrollbar-width:none; }
+.ticker-wrap::-webkit-scrollbar { display:none; }
+.ticker { display:flex; gap:20px; white-space:nowrap; }
+.tick { display:inline-flex; flex-direction:column; }
+.tick-pair { font-size:10px; color:rgba(255,255,255,0.6); font-weight:500; letter-spacing:0.5px; }
+.tick-rate { font-size:13px; font-weight:600; color:#fff; }
 
-/* Card */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
-.card-title { font-family: var(--mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+.status-bar { background:var(--white); border-bottom:1px solid var(--border); padding:8px 20px; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-mid); }
+.dot { width:7px; height:7px; border-radius:50%; background:#ccc; flex-shrink:0; }
+.dot.live { background:#22c55e; box-shadow:0 0 5px #22c55e; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.refresh-btn { margin-left:auto; background:none; border:1px solid var(--border); color:var(--blue); font-size:12px; font-family:var(--font); padding:4px 12px; border-radius:6px; cursor:pointer; font-weight:500; }
+.refresh-btn:hover { background:var(--blue-light); }
 
-/* Fields */
-.field { margin-bottom: 14px; }
-.field label { display: block; font-size: 11px; color: var(--text-dim); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-.field input, .field select {
-  width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--text-bright);
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-family: var(--mono);
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.15s;
-  -webkit-appearance: none;
-}
-.field input:focus, .field select:focus { border-color: var(--accent); }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.content { max-width:480px; margin:0 auto; padding:20px 16px; }
 
-/* Spread row */
-.spread-row { display: flex; align-items: center; gap: 8px; }
-.spread-row input { flex: 1; }
-.spread-source { font-size: 10px; color: var(--accent); font-family: var(--mono); white-space: nowrap; }
+.card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:16px; box-shadow:var(--shadow-sm); }
+.card-title { font-size:13px; font-weight:600; color:var(--blue); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:16px; padding-bottom:10px; border-bottom:2px solid var(--blue-light); }
 
-/* Rate display */
-.rate-display { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 14px; }
-.rate-label { font-size: 10px; color: var(--text-dim); font-family: var(--mono); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-.rate-value { font-family: var(--mono); font-size: 28px; font-weight: 500; color: var(--text-bright); letter-spacing: 1px; }
-.rate-sub { font-size: 11px; color: var(--text-dim); font-family: var(--mono); margin-top: 4px; }
-.rates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-.rate-buy { border-left: 3px solid var(--accent2); }
-.rate-sell { border-left: 3px solid var(--red); }
-.rate-mid { border-left: 3px solid var(--accent); grid-column: 1/-1; }
+.field { margin-bottom:14px; }
+.field label { display:block; font-size:12px; font-weight:600; color:var(--text-mid); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.4px; }
+.field input, .field select { width:100%; background:var(--white); border:1.5px solid var(--border); color:var(--text); padding:10px 14px; border-radius:8px; font-family:var(--font); font-size:15px; outline:none; transition:border-color 0.15s, box-shadow 0.15s; -webkit-appearance:none; }
+.field input:focus, .field select:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(0,87,184,0.1); }
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-/* Buttons */
-.btn { width: 100%; padding: 13px; border-radius: 8px; border: none; font-family: var(--mono); font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; letter-spacing: 0.5px; }
-.btn:hover { opacity: 0.88; }
-.btn:disabled { opacity: 0.4; cursor: default; }
-.btn-primary { background: var(--accent); color: #fff; }
-.btn-email { background: var(--surface2); color: var(--accent2); border: 1px solid rgba(16,185,129,0.3); margin-top: 10px; }
-.btn-refresh { background: none; border: 1px solid var(--border); color: var(--text-dim); padding: 8px 14px; border-radius: 6px; font-family: var(--mono); font-size: 11px; cursor: pointer; width: auto; }
-.btn-refresh:hover { border-color: var(--accent); color: var(--accent); }
+.autocomplete-wrap { position:relative; }
+.autocomplete-dropdown { position:absolute; top:calc(100% + 4px); left:0; right:0; background:var(--white); border:1.5px solid var(--blue); border-radius:8px; box-shadow:var(--shadow-lg); z-index:100; max-height:200px; overflow-y:auto; display:none; }
+.autocomplete-dropdown.open { display:block; }
+.ac-item { padding:10px 14px; font-size:14px; color:var(--text); cursor:pointer; border-bottom:1px solid var(--border); }
+.ac-item:last-child { border-bottom:none; }
+.ac-item:hover, .ac-item.focused { background:var(--blue-light); color:var(--blue); font-weight:500; }
+.ac-empty { padding:10px 14px; font-size:13px; color:var(--text-dim); font-style:italic; }
 
-/* Client selector */
-.client-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-.chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-family: var(--mono); cursor: pointer; transition: all 0.15s; color: var(--text-dim); }
-.chip:hover, .chip.active { background: rgba(59,130,246,0.15); border-color: var(--accent); color: var(--accent); }
+.spread-row { display:flex; align-items:center; gap:8px; }
+.spread-row input { flex:1; }
+.spread-tag { font-size:11px; color:var(--blue); background:var(--blue-light); border:1px solid var(--blue-mid); border-radius:20px; padding:3px 10px; white-space:nowrap; font-weight:500; }
 
-/* Status */
-.status { display: flex; align-items: center; gap: 6px; font-size: 11px; font-family: var(--mono); margin-bottom: 14px; }
-.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); }
-.status-dot.live { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.btn { width:100%; padding:13px; border-radius:8px; border:none; font-family:var(--font); font-size:15px; font-weight:600; cursor:pointer; transition:all 0.15s; }
+.btn-primary { background:var(--blue); color:#fff; box-shadow:var(--shadow); }
+.btn-primary:hover { background:var(--blue-dark); }
+.btn-email { background:var(--white); color:var(--blue); border:2px solid var(--blue); margin-top:10px; font-size:14px; }
+.btn-email:hover { background:var(--blue-light); }
 
-/* Email preview */
-.email-preview { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-size: 12px; font-family: var(--mono); color: var(--text); white-space: pre-wrap; line-height: 1.7; max-height: 300px; overflow-y: auto; margin-bottom: 10px; }
-.email-to { margin-bottom: 10px; }
-.email-to input { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text-bright); padding: 9px 12px; border-radius: 6px; font-family: var(--mono); font-size: 13px; outline: none; }
-.email-to input:focus { border-color: var(--accent); }
+.rate-box { background:var(--blue); border-radius:var(--radius); padding:22px 20px; text-align:center; margin-bottom:14px; }
+.rate-box-label { font-size:12px; color:rgba(255,255,255,0.75); font-weight:500; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
+.rate-box-value { font-size:42px; font-weight:700; color:#fff; letter-spacing:1px; }
+.rate-box-sub { font-size:12px; color:rgba(255,255,255,0.65); margin-top:6px; }
+.rate-box-notional { font-size:14px; color:rgba(255,255,255,0.9); margin-top:8px; font-weight:500; }
+.quote-meta { display:flex; justify-content:space-between; font-size:12px; color:var(--text-dim); margin-bottom:14px; padding:0 2px; }
 
-/* API key setup */
-.setup-notice { background: rgba(59,130,246,0.07); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; padding: 14px; font-size: 12px; font-family: var(--mono); color: var(--text-dim); line-height: 1.7; margin-bottom: 16px; }
-.setup-notice strong { color: var(--accent); }
+.email-label { font-size:12px; font-weight:600; color:var(--text-mid); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:6px; }
+.email-to-row { margin-bottom:10px; }
+.email-to-row input { width:100%; background:var(--white); border:1.5px solid var(--border); color:var(--text); padding:9px 14px; border-radius:8px; font-family:var(--font); font-size:14px; outline:none; }
+.email-to-row input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(0,87,184,0.1); }
+.email-preview { background:var(--bg); border:1.5px solid var(--border); border-radius:8px; padding:14px; font-size:12px; font-family:monospace; color:var(--text-mid); white-space:pre-wrap; line-height:1.7; max-height:260px; overflow-y:auto; margin-bottom:10px; }
 
-/* Notional */
-.notional-display { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-align: center; margin-bottom: 14px; }
-.notional-display span { color: var(--text-bright); }
+.select-wrap { position:relative; }
+.select-wrap::after { content:"\25BE"; position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--text-mid); pointer-events:none; font-size:14px; }
 
-/* Divider */
-.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
-
-/* Loading spinner */
-.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.hidden { display: none !important; }
+.hidden { display:none !important; }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <div class="logo">
-      <div class="logo-icon">💱</div>
-      <h1>C4U FX QUOTE</h1>
-    </div>
-    <div class="subtitle">Live rate quoting tool — Currencies 4 You</div>
-  </header>
-
-  <!-- API Key setup -->
-  <div class="setup-notice" id="setupNotice">
-    <strong>API Key Required</strong><br>
-    Enter your Open Exchange Rates App ID below to enable live rates.
-    <div style="margin-top:10px">
-      <input type="text" id="apiKeyInput" placeholder="Enter App ID..." style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text-bright);padding:8px 12px;border-radius:6px;font-family:var(--mono);font-size:12px;outline:none;margin-bottom:8px;">
-      <button class="btn btn-primary" style="padding:8px" onclick="saveApiKey()">Save & Connect</button>
-    </div>
+<header>
+  <img src="./icons/icon-192.png" class="logo-img" alt="C4U">
+  <div class="header-text">
+    <h1>C4U FX Quote</h1>
+    <p>Live rate quoting — Currencies 4 You</p>
   </div>
+</header>
 
-  <!-- Live ticker -->
-  <div class="ticker" id="ticker"></div>
+<div class="ticker-wrap">
+  <div class="ticker" id="ticker"><span style="color:rgba(255,255,255,0.4);font-size:12px">Loading rates...</span></div>
+</div>
 
-  <!-- Status -->
-  <div class="status">
-    <div class="status-dot" id="statusDot"></div>
-    <span id="statusText">Not connected</span>
-    <button class="btn-refresh" onclick="fetchRates()" id="refreshBtn" style="margin-left:auto">↻ Refresh</button>
-  </div>
+<div class="status-bar">
+  <div class="dot" id="statusDot"></div>
+  <span id="statusText">Connecting...</span>
+  <button class="refresh-btn" onclick="fetchRates()">&#8635; Refresh</button>
+</div>
 
-  <!-- Quote builder -->
+<div class="content">
+
   <div class="card">
-    <div class="card-title">// Build Quote</div>
+    <div class="card-title">Build Quote</div>
 
     <div class="field">
       <label>Client Name</label>
-      <input type="text" id="clientName" placeholder="Type or select below...">
-      <div class="client-chips" id="clientChips"></div>
+      <div class="autocomplete-wrap">
+        <input type="text" id="clientName" placeholder="Start typing client name..." autocomplete="off"
+          oninput="onClientInput()" onfocus="onClientFocus()" onblur="onClientBlur()">
+        <div class="autocomplete-dropdown" id="acDropdown"></div>
+      </div>
     </div>
 
     <div class="field-row">
       <div class="field">
-        <label>Base Currency</label>
-        <select id="baseCcy"></select>
+        <label>They Sell</label>
+        <div class="select-wrap">
+          <select id="baseCcy" onchange="onPairChange()"></select>
+        </div>
       </div>
       <div class="field">
-        <label>Quote Currency</label>
-        <select id="quoteCcy"></select>
+        <label>They Buy</label>
+        <div class="select-wrap">
+          <select id="quoteCcy" onchange="onPairChange()"></select>
+        </div>
       </div>
     </div>
 
     <div class="field">
-      <label>Notional Amount</label>
-      <input type="number" id="notional" placeholder="e.g. 100000" value="100000">
+      <label>Notional Amount (optional)</label>
+      <input type="number" id="notional" placeholder="e.g. 100000">
     </div>
 
     <div class="field">
-      <label>Spread % <span style="color:var(--text-dim);font-size:10px">(from client history)</span></label>
+      <label>Spread %</label>
       <div class="spread-row">
-        <input type="number" id="spreadInput" step="0.0001" placeholder="e.g. 0.0100">
-        <span class="spread-source" id="spreadSource"></span>
+        <input type="number" id="spreadInput" step="0.0001" placeholder="Auto-filled from history">
+        <span class="spread-tag hidden" id="spreadSource">from history</span>
       </div>
     </div>
 
-    <button class="btn btn-primary" onclick="buildQuote()" id="quoteBtn">Generate Quote</button>
+    <button class="btn btn-primary" onclick="buildQuote()">Generate Quote</button>
   </div>
 
-  <!-- Quote result -->
   <div class="card hidden" id="quoteResult">
-    <div class="card-title" style="display:flex;justify-content:space-between">
-      <span>// Quote</span>
-      <span id="quoteTime" style="color:var(--text-dim)"></span>
+    <div class="card-title">Quote</div>
+
+    <div class="rate-box">
+      <div class="rate-box-label" id="rateBoxLabel">Client Rate</div>
+      <div class="rate-box-value" id="sellRate">-</div>
+      <div class="rate-box-sub" id="pairLabel">-</div>
+      <div class="rate-box-notional hidden" id="sellNotional"></div>
     </div>
 
-    <div class="rate-display rate-sell" style="grid-column:1/-1">
-      <div class="rate-label">Your Rate (${base}/${quote})</div>
-      <div class="rate-value" id="sellRate">—</div>
-      <div class="rate-sub" id="sellNotional">—</div>
-      <div class="rate-sub" id="pairLabel" style="margin-top:4px">—</div>
+    <div class="quote-meta">
+      <span id="quoteClient"></span>
+      <span id="quoteTime"></span>
     </div>
 
-    <div class="notional-display" id="notionalDisplay"></div>
+    <hr style="border:none;border-top:1px solid var(--border);margin-bottom:16px">
 
-    <hr class="divider">
-
-    <div class="card-title">// Quote Email</div>
-    <div class="email-to">
+    <div class="email-label">Quote Email</div>
+    <div class="email-to-row">
       <input type="email" id="emailTo" placeholder="Client email address...">
     </div>
     <div class="email-preview" id="emailPreview"></div>
-    <button class="btn btn-email" onclick="openEmail()">✉ Open in Outlook</button>
+    <button class="btn btn-email" onclick="openEmail()">&#9993; Open in Outlook</button>
   </div>
 
 </div>
 
 <script>
-// ── Config ────────────────────────────────────────────────────────
-const API_KEY_STORE   = 'c4u_oxr_key';
-const CLIENT_HISTORY  = 'sm_trades_v2';  // shared with spread monitor
-const LAST_EMAIL_KEY  = 'c4u_quote_email';
-const BUILT_IN_KEY    = 'eddb52143b7d45879d5fc8b3753a684c';
-
-const COMMON_PAIRS = ['USD','EUR','GBP','JPY','CHF','AUD','CAD','NZD','HKD','SGD','NOK','SEK','DKK','ZAR','AED','SAR','QAR','KWD','BHD','OMR','TRY','PLN','CZK','HUF'];
+const API_KEY_STORE  = "c4u_oxr_key";
+const LAST_EMAIL_KEY = "c4u_quote_email";
+const BUILT_IN_KEY   = "eddb52143b7d45879d5fc8b3753a684c";
+const COMMON_PAIRS   = ["USD","EUR","GBP","JPY","CHF","AUD","CAD","NZD","HKD","SGD","NOK","SEK","DKK","ZAR","AED","SAR","QAR","KWD","BHD","OMR","TRY","PLN","CZK","HUF"];
 
 let rates = {};
-let lastFetch = null;
+let allClients = [];
 
-// ── Init ──────────────────────────────────────────────────────────
 function init() {
   populateCurrencySelects();
   loadClientHistory();
-  // Use built-in key if none stored
-  if (!localStorage.getItem(API_KEY_STORE)) {
-    localStorage.setItem(API_KEY_STORE, BUILT_IN_KEY);
-  }
-  document.getElementById('setupNotice').style.display = 'none';
+  if (!localStorage.getItem(API_KEY_STORE)) localStorage.setItem(API_KEY_STORE, BUILT_IN_KEY);
   fetchRates();
-  // Restore last email
   const lastEmail = localStorage.getItem(LAST_EMAIL_KEY);
-  if (lastEmail) document.getElementById('emailTo').value = lastEmail;
-  // Auto-refresh every 5 minutes
+  if (lastEmail) document.getElementById("emailTo").value = lastEmail;
   setInterval(fetchRates, 5 * 60 * 1000);
 }
 
-function saveApiKey() {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  if (!key) return;
-  localStorage.setItem(API_KEY_STORE, key);
-  document.getElementById('setupNotice').style.display = 'none';
-  fetchRates();
-}
-
-// ── Currency selects ──────────────────────────────────────────────
 function populateCurrencySelects() {
-  ['baseCcy','quoteCcy'].forEach((id, i) => {
+  ["baseCcy","quoteCcy"].forEach((id, i) => {
     const sel = document.getElementById(id);
     COMMON_PAIRS.forEach(c => {
-      const o = document.createElement('option');
+      const o = document.createElement("option");
       o.value = o.textContent = c;
       sel.appendChild(o);
     });
-    sel.value = i === 0 ? 'EUR' : 'GBP';
+    sel.value = i === 0 ? "GBP" : "EUR";
   });
-  document.getElementById('baseCcy').addEventListener('change', onPairChange);
-  document.getElementById('quoteCcy').addEventListener('change', onPairChange);
 }
 
 function onPairChange() {
-  const client = document.getElementById('clientName').value.trim();
-  if (client) lookupClientSpread(client);
+  const name = document.getElementById("clientName").value.trim();
+  if (name) lookupClientSpread(name);
 }
 
-// ── Fetch live rates ──────────────────────────────────────────────
 async function fetchRates() {
-  const key = localStorage.getItem(API_KEY_STORE);
-  if (!key) return;
-
-  setStatus('loading', 'Fetching rates...');
+  setStatus("loading", "Fetching live rates...");
   try {
-    const res  = await fetch(`https://openexchangerates.org/api/latest.json?app_id=${key}&symbols=${COMMON_PAIRS.join(',')}`);
+    const key = localStorage.getItem(API_KEY_STORE);
+    const res  = await fetch("https://openexchangerates.org/api/latest.json?app_id=" + key + "&symbols=" + COMMON_PAIRS.join(","));
     const data = await res.json();
     if (data.error) throw new Error(data.description || data.error);
-
     rates = data.rates;
-    lastFetch = new Date();
-    setStatus('live', `Live · ${lastFetch.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'})}`);
+    setStatus("live", "Live · " + new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}));
     renderTicker();
   } catch(e) {
-    setStatus('error', 'Error: ' + e.message);
+    setStatus("error", "Error: " + e.message);
   }
 }
 
 function setStatus(state, text) {
-  const dot  = document.getElementById('statusDot');
-  const span = document.getElementById('statusText');
-  dot.className  = 'status-dot' + (state === 'live' ? ' live' : '');
-  span.textContent = text;
+  document.getElementById("statusDot").className = "dot" + (state === "live" ? " live" : "");
+  document.getElementById("statusText").textContent = text;
 }
 
-// ── Ticker ────────────────────────────────────────────────────────
 function renderTicker() {
-  const pairs = [['EUR','GBP'],['GBP','USD'],['EUR','USD'],['USD','JPY'],['USD','CHF'],['AUD','USD'],['USD','CAD']];
-  const ticker = document.getElementById('ticker');
-  ticker.innerHTML = pairs.map(([b,q]) => {
-    const rate = getRate(b, q);
-    if (!rate) return '';
-    return `<div class="tick">
-      <div class="tick-pair">${b}/${q}</div>
-      <div class="tick-rate">${rate.toFixed(4)}</div>
-    </div>`;
-  }).join('');
+  const pairs = [["GBP","EUR"],["GBP","USD"],["EUR","USD"],["USD","JPY"],["GBP","CHF"],["AUD","USD"],["USD","CAD"]];
+  document.getElementById("ticker").innerHTML = pairs.map(function(p) {
+    var r = getRate(p[0],p[1]);
+    return r ? "<div class=\"tick\"><span class=\"tick-pair\">" + p[0] + "/" + p[1] + "</span><span class=\"tick-rate\">" + r.toFixed(4) + "</span></div>" : "";
+  }).join("");
 }
 
-// ── Cross rate calculation ────────────────────────────────────────
 function getRate(base, quote) {
   if (!rates[base] || !rates[quote]) return null;
-  // All rates are vs USD, so cross = quote_rate / base_rate
   return rates[quote] / rates[base];
 }
 
-// ── Client history from spread monitor ───────────────────────────
 function loadClientHistory() {
   try {
-    const raw = localStorage.getItem('sm_trades_v2');
+    const raw = localStorage.getItem("sm_trades_v2");
     if (!raw) return;
     const trades = JSON.parse(raw);
-    const clients = [...new Set(trades.map(t => t.client).filter(Boolean))].sort();
-    const chips = document.getElementById('clientChips');
-    chips.innerHTML = clients.map(c =>
-      `<div class="chip" onclick="selectClient('${c.replace(/'/g,"\\'")}', event)">${c}</div>`
-    ).join('');
+    allClients = Array.from(new Set(trades.map(function(t){return t.client;}).filter(Boolean))).sort();
   } catch(e) {}
 }
 
-function selectClient(name, event) {
-  document.getElementById('clientName').value = name;
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  event.target.classList.add('active');
+function onClientInput() {
+  const val = document.getElementById("clientName").value.trim().toLowerCase();
+  renderDropdown(val);
+  if (val.length >= 1) lookupClientSpread(document.getElementById("clientName").value.trim());
+}
+
+function onClientFocus() {
+  renderDropdown(document.getElementById("clientName").value.trim().toLowerCase());
+}
+
+function onClientBlur() {
+  setTimeout(function() {
+    document.getElementById("acDropdown").classList.remove("open");
+  }, 180);
+}
+
+function renderDropdown(filter) {
+  const dd = document.getElementById("acDropdown");
+  const matches = filter ? allClients.filter(function(c){return c.toLowerCase().includes(filter);}) : allClients;
+  if (!matches.length) {
+    dd.innerHTML = "<div class=\"ac-empty\">No clients found</div>";
+  } else {
+    dd.innerHTML = matches.map(function(c) {
+      var safe = c.replace(/'/g, "\\'");
+      var highlighted = filter ? c.replace(new RegExp(filter.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"), function(m){return "<strong>" + m + "</strong>";}) : c;
+      return "<div class=\"ac-item\" onmousedown=\"selectClient(\'" + safe + "');\">" + highlighted + "</div>";
+    }).join("");
+  }
+  dd.classList.toggle("open", allClients.length > 0 || matches.length > 0);
+}
+
+function selectClient(name) {
+  document.getElementById("clientName").value = name;
+  document.getElementById("acDropdown").classList.remove("open");
   lookupClientSpread(name);
 }
 
 function getClientSpread(clientName, base, quote) {
   try {
-    const raw = localStorage.getItem('sm_trades_v2');
+    const raw = localStorage.getItem("sm_trades_v2");
     if (!raw) return null;
     const trades = JSON.parse(raw);
-    const pair1 = base + quote;
-    const pair2 = quote + base;
-    // Exact pair match first
-    const byPair = trades
-      .filter(t => t.client === clientName && t.pair && (t.pair === pair1 || t.pair === pair2))
-      .sort((a,b) => new Date(b.date) - new Date(a.date));
-    if (byPair.length > 0) return byPair[0].spread;
-    // Fall back to any pair for this client
-    const any = trades
-      .filter(t => t.client === clientName)
-      .sort((a,b) => new Date(b.date) - new Date(a.date));
-    return any.length > 0 ? any[0].spread : null;
+    const p1 = base+quote, p2 = quote+base;
+    const byPair = trades.filter(function(t){return t.client===clientName && t.pair && (t.pair===p1||t.pair===p2);}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    if (byPair.length) return byPair[0].spread;
+    const any = trades.filter(function(t){return t.client===clientName;}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    return any.length ? any[0].spread : null;
   } catch(e) { return null; }
 }
 
 function lookupClientSpread(clientName) {
-  const base  = document.getElementById('baseCcy').value;
-  const quote = document.getElementById('quoteCcy').value;
+  const base  = document.getElementById("baseCcy").value;
+  const quote = document.getElementById("quoteCcy").value;
   const spread = getClientSpread(clientName, base, quote);
+  const tag = document.getElementById("spreadSource");
   if (spread !== null) {
-    document.getElementById('spreadInput').value = spread;
-    document.getElementById('spreadSource').textContent = '↑ from history';
+    document.getElementById("spreadInput").value = spread;
+    tag.textContent = "↑ from history";
+    tag.classList.remove("hidden");
   } else {
-    document.getElementById('spreadInput').value = '';
-    document.getElementById('spreadSource').textContent = 'no history found';
+    tag.classList.add("hidden");
   }
 }
 
-// ── Build quote ───────────────────────────────────────────────────
 function buildQuote() {
-  const base     = document.getElementById('baseCcy').value;
-  const quote    = document.getElementById('quoteCcy').value;
-  const notional = parseFloat(document.getElementById('notional').value) || 0;
-  const client   = document.getElementById('clientName').value.trim() || 'Client';
+  const base     = document.getElementById("baseCcy").value;
+  const quote    = document.getElementById("quoteCcy").value;
+  const notional = parseFloat(document.getElementById("notional").value) || 0;
+  const client   = document.getElementById("clientName").value.trim() || "Client";
 
-  if (!Object.keys(rates).length) { alert('Please wait for live rates to load first.'); return; }
-  if (base === quote) { alert('Please select two different currencies.'); return; }
+  if (!Object.keys(rates).length) { alert("Please wait for live rates to load."); return; }
+  if (base === quote) { alert("Please select two different currencies."); return; }
 
-  // Auto-pull spread from client history if not already set
-  let spread = parseFloat(document.getElementById('spreadInput').value);
+  let spread = parseFloat(document.getElementById("spreadInput").value);
   if (isNaN(spread) || spread <= 0) {
     spread = getClientSpread(client, base, quote);
     if (spread) {
-      document.getElementById('spreadInput').value = spread;
+      document.getElementById("spreadInput").value = spread;
+      document.getElementById("spreadSource").classList.remove("hidden");
     } else {
-      alert('Please enter a spread — no previous trade found for this client.'); return;
+      alert("Please enter a spread - no previous trade found for this client."); return;
     }
   }
 
   const mid = getRate(base, quote);
-  if (!mid) { alert(`Could not calculate rate for ${base}/${quote}.`); return; }
+  if (!mid) { alert("Cannot calculate " + base + "/" + quote + " - rate not available."); return; }
 
-  const spreadFactor = spread / 100;
-  const buyRate  = mid * (1 + spreadFactor);
-  const sellRate = mid * (1 - spreadFactor);
+  const sellRate     = mid * (1 - spread / 100);
+  const dp           = mid < 10 ? 4 : mid < 100 ? 3 : 2;
+  const sellNotional = notional > 0 ? (notional * sellRate).toLocaleString("en-GB",{maximumFractionDigits:2}) : "";
+  const notionalFmt  = notional > 0 ? notional.toLocaleString("en-GB") : "";
+  const now          = new Date();
 
-  const dp = mid < 10 ? 4 : mid < 100 ? 3 : 2;
+  document.getElementById("rateBoxLabel").textContent  = base + " / " + quote + " — Client Rate";
+  document.getElementById("sellRate").textContent      = sellRate.toFixed(dp);
+  document.getElementById("pairLabel").textContent     = "Mid-market: " + mid.toFixed(dp) + " · Spread: " + spread + "%";
+  document.getElementById("quoteClient").textContent   = client;
+  document.getElementById("quoteTime").textContent     = now.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
 
-  const buyNotional  = notional > 0 ? (notional * buyRate).toLocaleString('en-GB',  {maximumFractionDigits:2}) : '';
-  const sellNotional = notional > 0 ? (notional * sellRate).toLocaleString('en-GB', {maximumFractionDigits:2}) : '';
-  const notionalFmt  = notional > 0 ? notional.toLocaleString('en-GB') : '';
+  const notionalEl = document.getElementById("sellNotional");
+  if (notional > 0) {
+    notionalEl.textContent = notionalFmt + " " + base + " = " + sellNotional + " " + quote;
+    notionalEl.classList.remove("hidden");
+  } else {
+    notionalEl.classList.add("hidden");
+  }
 
-  document.getElementById('sellRate').textContent     = sellRate.toFixed(dp);
-  document.getElementById('sellNotional').textContent = notional > 0 ? `${notionalFmt} ${base} = ${sellNotional} ${quote}` : '';
-  document.getElementById('pairLabel').textContent    = `Mid-market: ${mid.toFixed(dp)} · Spread: ${spread}%`;
-  document.getElementById('notionalDisplay').innerHTML = notional > 0
-    ? `Notional: <span>${notionalFmt} ${base}</span>` : '';
+  const timeStr = now.toLocaleString("en-GB",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
+  const notionalLine = notional > 0 ? "
+Notional: " + notionalFmt + " " + base + " = " + sellNotional + " " + quote + "
+" : "";
 
-  const now = new Date();
-  document.getElementById('quoteTime').textContent = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-
-  const emailBody = buildQuoteEmail({client, base, quote, mid, sellRate, notional, notionalFmt, sellNotional, dp, spread, now});
-  document.getElementById('emailPreview').textContent = emailBody;
-
-  document.getElementById('quoteResult').classList.remove('hidden');
-  document.getElementById('quoteResult').scrollIntoView({behavior:'smooth', block:'start'});
-}
-
-function buildQuoteEmail({client, base, quote, mid, sellRate, notional, notionalFmt, sellNotional, dp, spread, now}) {
-  const timeStr = now.toLocaleString('en-GB', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  const notionalLine = notional > 0
-    ? `\nNotional: ${notionalFmt} ${base} = ${sellNotional} ${quote}\n`
-    : '';
-
-  return `Hi ${client},
+  document.getElementById("emailPreview").textContent = "Hi " + client + ",
 
 Thank you for your enquiry. Please find below your indicative exchange rate quote:
 
-Currency Pair:  ${base}/${quote}
-Quote Time:     ${timeStr}
+Currency Pair:  " + base + "/" + quote + "
+Quote Time:     " + timeStr + "
 
-Your Rate:  ${sellRate.toFixed(dp)}
-${notionalLine}
+Your Rate:  " + sellRate.toFixed(dp) + "
+" + notionalLine + "
 Please note this rate is indicative only and subject to change. To lock in a rate, please confirm your order and we will process accordingly.
 
-If you have any questions, please don't hesitate to get in touch.
+If you have any questions, please don’t hesitate to get in touch.
 
 Warm Regards,
 
@@ -477,36 +400,26 @@ Shyam S. Gokani Head of Trading | www.currencies4you.com
 
 T: +44 (0) 1322 319550 M: +44 (0) 7534 285661 E: shyam.gokani@currencies4you.com A: Currencies 4 You, Regus House, Victory Way, Admirals Park, Crossway Dartford, DA2 6QD
 
-This email and any attachments may be confidential and/or legally privileged. If you have received this email and you are not a named addressee, please inform the sender by return email and delete both emails. If you are not a named addressee you must not use, disclose, distribute, copy, print or rely on this email. Any views or opinions presented are solely those of the author. Any statements made, or intentions expressed in this communication may not necessarily reflect the view of Currencies 4 You Ltd. No content herein will bind Currencies 4 You Ltd or any associated company unless confirmed by a formal contract from Currencies 4 You Ltd. Any figures or amounts given in this email are quotations only and are subject to change. Currencies 4 You Ltd makes no representation or warranty as to the absence of viruses in this e-mail or any attachments. Currencies 4 You is a company registered in England and Wales (registered no. 06866898) Currencies 4 You's Payment and Foreign Currency Exchange Services are provided by Equals Connect Limited which is part of the Equals Group plc. Equals Connect is authorised by the Financial Conduct Authority to provide payment services. (Financial Services Register No: 671508).`;
+This email and any attachments may be confidential and/or legally privileged. If you have received this email and you are not a named addressee, please inform the sender by return email and delete both emails. If you are not a named addressee you must not use, disclose, distribute, copy, print or rely on this email. Any views or opinions presented are solely those of the author. Any statements made, or intentions expressed in this communication may not necessarily reflect the view of Currencies 4 You Ltd. No content herein will bind Currencies 4 You Ltd or any associated company unless confirmed by a formal contract from Currencies 4 You Ltd. Any figures or amounts given in this email are quotations only and are subject to change. Currencies 4 You Ltd makes no representation or warranty as to the absence of viruses in this e-mail or any attachments. Currencies 4 You is a company registered in England and Wales (registered no. 06866898) Currencies 4 You’s Payment and Foreign Currency Exchange Services are provided by Equals Connect Limited which is part of the Equals Group plc. Equals Connect is authorised by the Financial Conduct Authority to provide payment services. (Financial Services Register No: 671508).";
+
+  document.getElementById("quoteResult").classList.remove("hidden");
+  document.getElementById("quoteResult").scrollIntoView({behavior:"smooth", block:"start"});
 }
 
 function openEmail() {
-  const to      = document.getElementById('emailTo').value.trim();
-  const body    = document.getElementById('emailPreview').textContent;
-  const base    = document.getElementById('baseCcy').value;
-  const quote   = document.getElementById('quoteCcy').value;
-  const subject = `FX Rate Quote — ${base}/${quote}`;
+  const to      = document.getElementById("emailTo").value.trim();
+  const body    = document.getElementById("emailPreview").textContent;
+  const base    = document.getElementById("baseCcy").value;
+  const quote   = document.getElementById("quoteCcy").value;
+  const subject = "FX Rate Quote — " + base + "/" + quote;
   if (to) localStorage.setItem(LAST_EMAIL_KEY, to);
-  window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = "mailto:" + encodeURIComponent(to) + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
 }
 
-// ── Client name input listener ────────────────────────────────────
-document.getElementById('clientName').addEventListener('input', function() {
-  const val = this.value.trim();
-  document.querySelectorAll('.chip').forEach(c => {
-    c.classList.toggle('active', c.textContent.trim() === val);
-  });
-  if (val) lookupClientSpread(val);
-});
-
-// ── Start ─────────────────────────────────────────────────────────
 init();
 
-// ── Service worker ────────────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() { navigator.serviceWorker.register("./sw.js").catch(function(){}); });
 }
 </script>
 </body>
